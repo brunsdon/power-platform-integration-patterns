@@ -2,6 +2,18 @@
 
 When integrating Power Platform with external systems, clear architectural principles help avoid fragile or tightly coupled solutions.
 
+## Recommended Separation
+
+```mermaid
+flowchart LR
+		UI[Portal or App UI] --> BL[Business Logic in Power Platform]
+		BL --> INT[Integration Layer]
+		INT --> MSG[Messaging or API Boundary]
+		MSG --> EXT[External Systems]
+```
+
+The goal is simple: keep business interactions close to Power Platform, and push cross-system integration concerns into services that can be monitored, retried, and evolved independently.
+
 ## Prefer Asynchronous Integration
 
 Whenever possible:
@@ -74,3 +86,25 @@ Integration questions to clarify early:
 - which system initiates updates?
 - what happens when systems disagree?
 - what should happen during outages?
+
+## Review Checklist Example
+
+```csharp
+var integrationReview = new
+{
+	SystemOfRecord = "dataverse",
+	InvocationModel = "asynchronous",
+	RetryStrategy = "exponential-backoff",
+	IdempotencyKey = "correlationId",
+	AuditLogging = true,
+	SecretsStoredIn = "key-vault"
+};
+```
+
+That kind of lightweight checklist helps teams make architectural decisions explicit before implementation starts.
+
+## Related Pages
+
+- [Dataverse Integration](dataverse-integration.md) for choosing the right Dataverse boundary
+- [API Integration](api-integration.md) for direct service-to-service patterns
+- [Event Driven Patterns](event-driven-patterns.md) for resilient asynchronous design
